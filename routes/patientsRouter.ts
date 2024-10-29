@@ -10,4 +10,13 @@ router.get(
   }
 );
 
+router.post("/", async (req, res) => {
+  const newPatient = await patientsService.addPatient(req.body);
+  if (!newPatient) {
+    res.status(400).json({ error: "Invalid patient data" });
+  }
+  console.log("New patient added:", newPatient);
+  res.status(201).json(newPatient);
+});
+
 export default router;
