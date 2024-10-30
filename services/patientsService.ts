@@ -1,52 +1,32 @@
 import patientsData from "../data/patients";
 import { v1 as uuid } from "uuid";
-import { Gender, Patients, PatientsNonSensitiveEntries } from "../types/types";
-
-const isGender = (param: any): param is Gender => {
-  return Object.values(Gender).includes(param);
-};
+import { PatientResult, PatientSchema } from "../types/types";
+import { z } from "zod";
 
 const getAllPatients = () => {
   return patientsData.map(({ ssn, ...rest }) => rest);
 };
 
 const addPatient = async (
-  patient: Omit<Patients, "id">
-): Promise<PatientsNonSensitiveEntries | null | undefined> => {
-  if (!patient) {
-    return undefined;
-  }
-
-  if (!patient.ssn) {
-    return undefined;
-  }
-
-  if (!patient.name) {
-    return undefined;
-  }
-
-  if (!patient.dateOfBirth) {
-    return undefined;
-  }
-
-  if (!patient.gender || !isGender(patient.gender)) {
-    return undefined;
-  }
-
-  if (!patient.occupation) {
-    return undefined;
-  }
-
+  patient: z.infer<typeof PatientSchema>
+): Promise<PatientResult> => {
   try {
+    const validateData = PatientSchema.omit({ id: true }).parse(patient);
+
     const newPatient = {
+      ...validateData,
       id: uuid(),
-      ...patient,
     };
 
-    patientsData.push(newPatient);
-    return newPatient;
+    const validatePatient = PatientSchema.parse(newPatient);
+
+    patientsData.push(validatePatient);
+    return { success: true, data: validatePatient };
   } catch (error) {
-    return undefined;
+    if (error instanceof z.ZodError) {
+      return { success: false, errors: error.issues };
+    }
+    return { success: false, errors: ["Unknown error"] };
   }
 };
 
