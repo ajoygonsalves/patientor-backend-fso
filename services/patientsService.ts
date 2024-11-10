@@ -30,9 +30,12 @@ const addPatient = async (
   }
 };
 
-const getPatientById = (id: string) => {
+const getPatientById = (id: string): PatientResult => {
   const patient = patientsData.find((patient) => patient.id === id);
-  return patient;
+  if (!patient) {
+    return { success: false, errors: ["Patient not found"] };
+  }
+  return { success: true, data: patient };
 };
 
 export default {
