@@ -12,6 +12,8 @@ export interface Diagnosis {
   latin?: string;
 }
 
+export interface Entry {}
+
 export interface Patients {
   id: string;
   name: string;
@@ -19,9 +21,10 @@ export interface Patients {
   ssn: string;
   gender: Gender;
   occupation: string;
+  entries: Entry[];
 }
 
-export type PatientsNonSensitiveEntries = Omit<Patients, "ssn">;
+export type PatientsNonSensitiveEntries = Omit<Patients, "ssn" | "entries">;
 
 export const PatientSchema = z.object({
   id: z.string().uuid("Invalid id"),
@@ -32,6 +35,7 @@ export const PatientSchema = z.object({
     errorMap: () => ({ message: "Gender is required" }),
   }),
   occupation: z.string().min(1, "Occupation is required"),
+  entries: z.array(z.any()),
 });
 
 export type PatientResult = {

@@ -10,6 +10,14 @@ router.get(
   }
 );
 
+router.get("/:id", (req, res) => {
+  const patient = patientsService.getPatientById(req.params.id);
+  if (!patient) {
+    res.status(404).json({ error: "Patient not found" });
+  }
+  res.status(200).json(patient);
+});
+
 router.post("/", async (req, res) => {
   const newPatient = await patientsService.addPatient(req.body);
   if (!newPatient) {

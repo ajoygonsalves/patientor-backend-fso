@@ -30,7 +30,13 @@ const addPatient = async (
   }
 };
 
+const getPatientById = (id: string) => {
+  const patient = patientsData.find((patient) => patient.id === id);
+  return patient;
+};
+
 export default {
   getAllPatients,
   addPatient,
+  getPatientById,
 };
