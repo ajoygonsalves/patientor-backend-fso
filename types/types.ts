@@ -82,3 +82,45 @@ interface OccupationalHealthcareEntry extends BaseEntry {
     endDate: string;
   };
 }
+
+export type UnionOmit<T, K extends string | number | symbol> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
+const BaseEntrySchema = z.object({
+  id: z.string().uuid().optional(),
+  description: z.string().min(1),
+  date: z.string().min(1),
+  specialist: z.string().min(1),
+  diagnosisCodes: z.array(z.string()).optional(),
+});
+
+const HealthCheckEntrySchema = BaseEntrySchema.extend({
+  type: z.literal("HealthCheck"),
+  healthCheckRating: z.nativeEnum(HealthCheckRating),
+});
+
+const HospitalEntrySchema = BaseEntrySchema.extend({
+  type: z.literal("Hospital"),
+  discharge: z.object({
+    date: z.string(),
+    criteria: z.string(),
+  }),
+});
+
+const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
+  type: z.literal("OccupationalHealthcare"),
+  employerName: z.string(),
+  sickLeave: z
+    .object({
+      startDate: z.string(),
+      endDate: z.string(),
+    })
+    .optional(),
+});
+
+export const EntrySchema = z.discriminatedUnion("type", [
+  HealthCheckEntrySchema,
+  HospitalEntrySchema,
+  OccupationalHealthcareEntrySchema,
+]);

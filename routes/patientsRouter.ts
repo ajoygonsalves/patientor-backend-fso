@@ -27,4 +27,9 @@ router.post("/", async (req, res) => {
   res.status(201).json(newPatient);
 });
 
+router.post("/:id/entries", async (req, res) => {
+  const newEntry = await patientsService.addEntry(req.params.id, req.body);
+  res.status(201).json(newEntry);
+});
+
 export default router;
